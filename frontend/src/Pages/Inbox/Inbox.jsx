@@ -13,6 +13,8 @@ import { useHistory } from 'react-router-dom';
 import ListUser from '../../Components/ListUser/ListUser';
 import { showModalMessage } from '../../redux/message/message.slice';
 import { localeFunc } from '../../ultils/constants';
+import star from '../../images/star.png';
+import starColor from '../../images/starColor.png';
 // import RoomIcon from '@material-ui/icons/Room';
 const Inbox = (props) => {
   const dispatch = useDispatch();
@@ -34,6 +36,39 @@ const Inbox = (props) => {
 
   const [inputText, setInputText] = useState('');
   const messagesEnd = useRef(null);
+
+  const StarComponent = () => {
+    const [isAdded, setIsAdd] = useState(false);
+    return (
+      <div>
+        {isAdded ? (
+          <img
+            className="navbar__img"
+            alt="element"
+            src={starColor}
+            width="25px"
+            height="25px"
+            style={{ borderRadius: '1px', cursor: 'pointer' }}
+            onClick={() => {
+              setIsAdd(!isAdded);
+            }}
+          />
+        ) : (
+          <img
+            className="navbar__img"
+            alt="element"
+            src={star}
+            width="25px"
+            height="25px"
+            style={{ borderRadius: '1px', cursor: 'pointer' }}
+            onClick={() => {
+              setIsAdd(!isAdded);
+            }}
+          />
+        )}
+      </div>
+    );
+  };
 
   const scrollToBottom = () => {
     const scroll = messagesEnd.current.scrollHeight - messagesEnd.current.clientHeight;
@@ -194,6 +229,7 @@ const Inbox = (props) => {
               >
                 &nbsp;{infoFriend?.userName}
               </div>
+              <StarComponent />
             </div>
           )}
 

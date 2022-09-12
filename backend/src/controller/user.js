@@ -526,3 +526,74 @@ module.exports.removeRequest = async (req, res) => {
     return res.status(500).json({ error: 'Server error' });
   }
 };
+
+module.exports.addToListFavourite = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      return res.status(404).json({ code: 0, message: 'user is not exists' });
+    }
+    const me = await User.findOne({ _id: req.user._id });
+    const listUser = me.favourites;
+    console.log(listUser);
+    for (let i = 0; i < listUser.length; i++) {
+      if (listUser[i].userId.toString() === id) {
+        return res.status(400).json({ code: 0, message: 'user is added to favorites' });
+      }
+    }
+
+    const condition = { _id: req.user._id };
+    const update = {
+      $push: {
+        favourites: {
+          userId: id,
+        },
+      },
+    };
+    const result = await User.findOneAndUpdate(condition, update);
+    if (result) {
+      return res.send({ code: 0, message: 'Add user to favorites success' });
+    }
+  } catch (err) {
+    return res.status(500).json({ code: 1, message: 'Server error' });
+  }
+};
+
+module.exports.removeUserFromFavorites = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const user = User.findOne({ _id: id });
+    if (!user) {
+      return res.status(404).json({ code: 1, message: 'user is not exists' });
+    }
+    const me = await User.findOne({ _id: req.user._id });
+    const listUser = me.favourites;
+    let checkIsExists = false;
+    for (let i = 0; i < listUser.length; i++) {
+      if (listUser[i].userId.toString() === id) {
+        checkIsExists = true;
+        break;
+      }
+    }
+    if (!checkIsExists) {
+      return res.status(400).json({ code: 1, message: 'user is not exists in list favorite' });
+    }
+    const condition = {
+      _id: req.user._id,
+    };
+    const update = {
+      $pull: {
+        favourites: {
+          userId: id,
+        },
+      },
+    };
+    const result = await User.findOneAndUpdate(condition, update);
+    if (result) {
+      return res.status(200).json({ code: 0, message: 'remove user to favorites success' });
+    }
+  } catch (err) {
+    return res.status(500).json({ code: 1, message: 'Server error' });
+  }
+};
