@@ -1,4 +1,5 @@
 const User = require('../models/user.js');
+const nodemailer = require('nodemailer');
 
 // follow user
 const mongoose = require('mongoose');
@@ -596,4 +597,50 @@ module.exports.removeUserFromFavorites = async (req, res) => {
   } catch (err) {
     return res.status(500).json({ code: 1, message: 'Server error' });
   }
+};
+
+module.exports.sendMail = async (req, res) => {
+  try {
+    var transporter = nodemailer.createTransport({
+      // config mail server
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: 'hieu.phan@sotatek.com', //Tài khoản gmail vừa tạo
+        pass: 'hustphanhieu1432000', //Mật khẩu tài khoản gmail vừa tạo
+      },
+      tls: {
+        // do not fail on invalid certs
+        rejectUnauthorized: false,
+      },
+    });
+    var content = '';
+    var email = 'hieu.phan@sotatek.com';
+    var text = 'hello thang';
+    content += `
+      <div style="padding: 10px; background-color: #003375">
+          <div style="padding: 10px; background-color: white;">
+              <h4 style="color: #0085ff">Bạn có một tin nhắn từ ${email} trên ứng dụng Instagram</h4>
+              <span style="color: black">${text}</span>
+          </div>
+      </div>
+  `;
+    var mainOptions = {
+      from: 'test',
+      to: 'chihieusky@gmail.com',
+      subject: 'Thông báo từ Instagram',
+      text: 'Your text is here', //Thường thi mình không dùng cái này thay vào đó mình sử dụng html để dễ edit hơn
+      html: content, //Nội dung html mình đã tạo trên kia :))
+    };
+    transporter.sendMail(mainOptions, function (err, info) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log('Message sent: ' + info.response);
+        req.flash('mess', 'Một email đã được gửi đến tài khoản của bạn'); //Gửi thông báo đến người dùng
+        res.status(200).json({ message: 'send mail success' });
+      }
+    });
+  } catch (err) {}
 };

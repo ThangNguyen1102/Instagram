@@ -55,4 +55,6 @@ router.post('/add-user-to-favourites/:id', requireSignIn, controller.addToListFa
 
 router.post('/remove-user-from-favourites/:id', requireSignIn, controller.removeUserFromFavorites);
 
+router.post('/send-mail', requireSignIn, controller.sendMail);
+
 module.exports = router;
