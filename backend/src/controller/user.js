@@ -553,8 +553,9 @@ module.exports.addToListFavourite = async (req, res) => {
       },
     };
     const result = await User.findOneAndUpdate(condition, update);
+    const data = await User.findOne({ _id: req.user._id });
     if (result) {
-      return res.send({ code: 0, message: 'Add user to favorites success' });
+      return res.send({ code: 0, message: 'Add user to favorites success', data: data });
     }
   } catch (err) {
     return res.status(500).json({ code: 1, message: 'Server error' });
@@ -591,15 +592,16 @@ module.exports.removeUserFromFavorites = async (req, res) => {
       },
     };
     const result = await User.findOneAndUpdate(condition, update);
+    const data = await User.findOne({ _id: req.user._id });
     if (result) {
-      return res.status(200).json({ code: 0, message: 'remove user to favorites success' });
+      return res.status(200).json({ code: 0, message: 'remove user to favorites success', data: data });
     }
   } catch (err) {
     return res.status(500).json({ code: 1, message: 'Server error' });
   }
 };
 
-module.exports.sendMail = async (req, res) => {
+module.exports.sendMail = async (data) => {
   try {
     var transporter = nodemailer.createTransport({
       // config mail server
@@ -616,19 +618,17 @@ module.exports.sendMail = async (req, res) => {
       },
     });
     var content = '';
-    var email = 'hieu.phan@sotatek.com';
-    var text = 'hello thang';
     content += `
       <div style="padding: 10px; background-color: #003375">
           <div style="padding: 10px; background-color: white;">
-              <h4 style="color: #0085ff">Bạn có một tin nhắn từ ${email} trên ứng dụng Instagram</h4>
-              <span style="color: black">${text}</span>
+              <h4 style="color: #0085ff">Bạn có một tin nhắn từ ${data.emailMe} trên ứng dụng Instagram</h4>
+              <span style="color: black">${data.text}</span>
           </div>
       </div>
   `;
     var mainOptions = {
-      from: 'test',
-      to: 'chihieusky@gmail.com',
+      from: data.emailMe,
+      to: data.emailFriend,
       subject: 'Thông báo từ Instagram',
       text: 'Your text is here', //Thường thi mình không dùng cái này thay vào đó mình sử dụng html để dễ edit hơn
       html: content, //Nội dung html mình đã tạo trên kia :))
@@ -638,8 +638,6 @@ module.exports.sendMail = async (req, res) => {
         console.log(err);
       } else {
         console.log('Message sent: ' + info.response);
-        req.flash('mess', 'Một email đã được gửi đến tài khoản của bạn'); //Gửi thông báo đến người dùng
-        res.status(200).json({ message: 'send mail success' });
       }
     });
   } catch (err) {}

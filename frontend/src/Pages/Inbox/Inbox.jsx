@@ -110,6 +110,8 @@ const Inbox = (props) => {
           idFriend: infoFriend._id,
           idMe: infoUser._id,
           text: inputText.trim(),
+          emailFriend: infoFriend.email,
+          emailMe: infoUser.email,
         };
         socket?.emit('inbox_user', data);
       } else {
