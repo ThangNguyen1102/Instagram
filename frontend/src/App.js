@@ -44,7 +44,7 @@ function App(props) {
         <Route exact path="/login" component={LoginPage} />
         <ProtectedRoute exact path="/" component={infoUser?.role === 1 ? Dashboard : HomePage} />
         <Route exact path="/register" component={RegisterPage} />
-        <ProtectedRoute exact path="/suggest-detail" component={SuggestDetail} />
+        {/* <ProtectedRoute exact path="/suggest-detail" component={SuggestDetail} /> */}
         <ProtectedRoute exact path="/profile" component={infoUser?.role === 1 ? Dashboard : Profile} />
         <ProtectedRoute exact path="/post/:id" component={PostDetail} />
         <ProtectedRoute exact path="/admin" component={Dashboard} />
