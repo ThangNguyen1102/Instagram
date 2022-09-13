@@ -49,7 +49,6 @@ export const removeRequestApi = createAsyncThunk('user/remove-request', async (p
   }
 });
 
-
 export const searchUser = createAsyncThunk('user/search', async (query) => {
   try {
     return await axiosInstance.get(`/api/user/search?name=${query}`);
@@ -203,7 +202,7 @@ const userSlice = createSlice({
     },
     [`${unFollowApi.fulfilled}`]: (state, action) => {
       state.loading = false;
-      state.following = action.payload
+      state.following = action.payload;
     },
 
     //follow user
@@ -216,7 +215,7 @@ const userSlice = createSlice({
     },
     [`${followApi.fulfilled}`]: (state, action) => {
       state.loading = false;
-      state.following = action.payload
+      state.following = action.payload;
     },
 
     //accept request follow
@@ -229,7 +228,7 @@ const userSlice = createSlice({
     },
     [`${acceptFollowApi.fulfilled}`]: (state, action) => {
       state.loading = false;
-      state.followers = action.payload
+      state.followers = action.payload;
     },
   },
 });

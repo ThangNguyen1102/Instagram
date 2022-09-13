@@ -12,6 +12,7 @@ import sendMessage from '../../images/sendMessage.jpg';
 import { useHistory } from 'react-router-dom';
 import ListUser from '../../Components/ListUser/ListUser';
 import { showModalMessage } from '../../redux/message/message.slice';
+import { addUserToFavourites, removeUserFromFavourites } from '../../redux/auth/auth.slice';
 import { localeFunc } from '../../ultils/constants';
 import star from '../../images/star.png';
 import starColor from '../../images/starColor.png';
@@ -38,7 +39,20 @@ const Inbox = (props) => {
   const messagesEnd = useRef(null);
 
   const StarComponent = () => {
-    const [isAdded, setIsAdd] = useState(false);
+    const listFavourite = infoUser.favourites;
+    console.log('listFavourite: ', listFavourite);
+    console.log('infoFriend: ', infoFriend);
+    const [isAdded, setIsAdd] = useState(() => {
+      const listUser = listFavourite.filter((item) => item.userId === infoFriend._id);
+      return listUser.length > 0 ? true : false;
+    });
+    const handleAddUserToFavourite = async () => {
+      dispatch(addUserToFavourites(infoFriend._id));
+    };
+
+    const handleRemoveUserFromFavourite = async () => {
+      dispatch(removeUserFromFavourites(infoFriend._id));
+    };
     return (
       <div>
         {isAdded ? (
@@ -50,7 +64,7 @@ const Inbox = (props) => {
             height="25px"
             style={{ borderRadius: '1px', cursor: 'pointer' }}
             onClick={() => {
-              setIsAdd(!isAdded);
+              handleRemoveUserFromFavourite();
             }}
           />
         ) : (
@@ -62,7 +76,7 @@ const Inbox = (props) => {
             height="25px"
             style={{ borderRadius: '1px', cursor: 'pointer' }}
             onClick={() => {
-              setIsAdd(!isAdded);
+              handleAddUserToFavourite();
             }}
           />
         )}
@@ -95,6 +109,7 @@ const Inbox = (props) => {
         const data = {
           idFriend: infoFriend._id,
           idMe: infoUser._id,
+          text: inputText.trim(),
         };
         socket?.emit('inbox_user', data);
       } else {
