@@ -12,7 +12,10 @@ import sendMessage from '../../images/sendMessage.jpg';
 import { useHistory } from 'react-router-dom';
 import ListUser from '../../Components/ListUser/ListUser';
 import { showModalMessage } from '../../redux/message/message.slice';
+import { addUserToFavourites, removeUserFromFavourites } from '../../redux/auth/auth.slice';
 import { localeFunc } from '../../ultils/constants';
+import star from '../../images/star.png';
+import starColor from '../../images/starColor.png';
 // import RoomIcon from '@material-ui/icons/Room';
 const Inbox = (props) => {
   const dispatch = useDispatch();
@@ -34,6 +37,52 @@ const Inbox = (props) => {
 
   const [inputText, setInputText] = useState('');
   const messagesEnd = useRef(null);
+
+  const StarComponent = () => {
+    const listFavourite = infoUser.favourites;
+    console.log('listFavourite: ', listFavourite);
+    console.log('infoFriend: ', infoFriend);
+    const [isAdded, setIsAdd] = useState(() => {
+      const listUser = listFavourite.filter((item) => item.userId === infoFriend._id);
+      return listUser.length > 0 ? true : false;
+    });
+    const handleAddUserToFavourite = async () => {
+      dispatch(addUserToFavourites(infoFriend._id));
+    };
+
+    const handleRemoveUserFromFavourite = async () => {
+      dispatch(removeUserFromFavourites(infoFriend._id));
+    };
+    return (
+      <div>
+        {isAdded ? (
+          <img
+            className="navbar__img"
+            alt="element"
+            src={starColor}
+            width="25px"
+            height="25px"
+            style={{ borderRadius: '1px', cursor: 'pointer' }}
+            onClick={() => {
+              handleRemoveUserFromFavourite();
+            }}
+          />
+        ) : (
+          <img
+            className="navbar__img"
+            alt="element"
+            src={star}
+            width="25px"
+            height="25px"
+            style={{ borderRadius: '1px', cursor: 'pointer' }}
+            onClick={() => {
+              handleAddUserToFavourite();
+            }}
+          />
+        )}
+      </div>
+    );
+  };
 
   const scrollToBottom = () => {
     const scroll = messagesEnd.current.scrollHeight - messagesEnd.current.clientHeight;
@@ -60,6 +109,9 @@ const Inbox = (props) => {
         const data = {
           idFriend: infoFriend._id,
           idMe: infoUser._id,
+          text: inputText.trim(),
+          emailFriend: infoFriend.email,
+          emailMe: infoUser.email,
         };
         socket?.emit('inbox_user', data);
       } else {
@@ -194,6 +246,7 @@ const Inbox = (props) => {
               >
                 &nbsp;{infoFriend?.userName}
               </div>
+              <StarComponent />
             </div>
           )}
 

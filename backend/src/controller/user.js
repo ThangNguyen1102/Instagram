@@ -1,4 +1,5 @@
 const User = require('../models/user.js');
+const nodemailer = require('nodemailer');
 
 // follow user
 const mongoose = require('mongoose');
@@ -525,4 +526,119 @@ module.exports.removeRequest = async (req, res) => {
     console.log(err);
     return res.status(500).json({ error: 'Server error' });
   }
+};
+
+module.exports.addToListFavourite = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      return res.status(404).json({ code: 0, message: 'user is not exists' });
+    }
+    const me = await User.findOne({ _id: req.user._id });
+    const listUser = me.favourites;
+    console.log(listUser);
+    for (let i = 0; i < listUser.length; i++) {
+      if (listUser[i].userId.toString() === id) {
+        return res.status(400).json({ code: 0, message: 'user is added to favorites' });
+      }
+    }
+
+    const condition = { _id: req.user._id };
+    const update = {
+      $push: {
+        favourites: {
+          userId: id,
+        },
+      },
+    };
+    const result = await User.findOneAndUpdate(condition, update);
+    const data = await User.findOne({ _id: req.user._id });
+    if (result) {
+      return res.send({ code: 0, message: 'Add user to favorites success', data: data });
+    }
+  } catch (err) {
+    return res.status(500).json({ code: 1, message: 'Server error' });
+  }
+};
+
+module.exports.removeUserFromFavorites = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const user = User.findOne({ _id: id });
+    if (!user) {
+      return res.status(404).json({ code: 1, message: 'user is not exists' });
+    }
+    const me = await User.findOne({ _id: req.user._id });
+    const listUser = me.favourites;
+    let checkIsExists = false;
+    for (let i = 0; i < listUser.length; i++) {
+      if (listUser[i].userId.toString() === id) {
+        checkIsExists = true;
+        break;
+      }
+    }
+    if (!checkIsExists) {
+      return res.status(400).json({ code: 1, message: 'user is not exists in list favorite' });
+    }
+    const condition = {
+      _id: req.user._id,
+    };
+    const update = {
+      $pull: {
+        favourites: {
+          userId: id,
+        },
+      },
+    };
+    const result = await User.findOneAndUpdate(condition, update);
+    const data = await User.findOne({ _id: req.user._id });
+    if (result) {
+      return res.status(200).json({ code: 0, message: 'remove user to favorites success', data: data });
+    }
+  } catch (err) {
+    return res.status(500).json({ code: 1, message: 'Server error' });
+  }
+};
+
+module.exports.sendMail = async (data) => {
+  try {
+    var transporter = nodemailer.createTransport({
+      // config mail server
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: 'hieu.phan@sotatek.com', //Tài khoản gmail vừa tạo
+        pass: 'hustphanhieu1432000', //Mật khẩu tài khoản gmail vừa tạo
+      },
+      tls: {
+        // do not fail on invalid certs
+        rejectUnauthorized: false,
+      },
+    });
+    var content = '';
+    content += `
+      <div style="padding: 10px; background-color: #003375">
+          <div style="padding: 10px; background-color: white;">
+              <h4 style="color: #0085ff">Bạn có một tin nhắn từ ${data.emailMe} trên ứng dụng Instagram</h4>
+              <span style="color: black">${data.text}</span>
+          </div>
+      </div>
+  `;
+    var mainOptions = {
+      from: data.emailMe,
+      to: data.emailFriend,
+      subject: 'Thông báo từ Instagram',
+      text: 'Your text is here', //Thường thi mình không dùng cái này thay vào đó mình sử dụng html để dễ edit hơn
+      html: content, //Nội dung html mình đã tạo trên kia :))
+    };
+    transporter.sendMail(mainOptions, function (err, info) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log('Message sent: ' + info.response);
+      }
+    });
+  } catch (err) {}
 };

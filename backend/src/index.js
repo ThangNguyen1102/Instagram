@@ -6,6 +6,7 @@ const cors = require('cors');
 const { Server } = require('socket.io');
 const http = require('http');
 const User = require('./models/user.js');
+const UserController = require('./controller/user');
 require('dotenv').config({ path: path.resolve(__dirname, './config/index.env') });
 // require('dotenv').config({path: './config/index.env'})
 
@@ -86,7 +87,24 @@ io.on('connection', (socket) => {
     console.log('follow');
     io.emit('getNoti', data);
   });
-  socket.on('inbox_user', (data) => {
+  socket.on('inbox_user', async (data) => {
+    const user = await User.findOne({ _id: data.idMe });
+    const listFavourite = user.favourites;
+    let check = false;
+    for (let i = 0; i < listFavourite.length; i++) {
+      if (listFavourite[i].userId.toString() === data.idFriend) {
+        check = true;
+        break;
+      }
+    }
+
+    if (check) {
+      UserController.sendMail({
+        text: data.text,
+        emailMe: data.emailMe,
+        emailFriend: data.emailFriend,
+      });
+    }
     io.emit('get_message', data);
   });
   socket.on('report_post', (data) => {
@@ -100,7 +118,7 @@ io.on('connection', (socket) => {
   socket.on('accept_follow_user', (data) => {
     console.log('accept_follow');
     io.emit('getNoti', data);
-  })
+  });
 });
 
 server.listen(PORT, () => {

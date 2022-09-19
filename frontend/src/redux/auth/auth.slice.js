@@ -50,6 +50,22 @@ export const logout = createAsyncThunk('auth/logout', async () => {
   }
 });
 
+export const addUserToFavourites = createAsyncThunk('user/add-user-to-favourite', async (params) => {
+  try {
+    return await axiosInstance.post(`/api/user/add-user-to-favourites/${params}`);
+  } catch (error) {
+    throw error;
+  }
+});
+
+export const removeUserFromFavourites = createAsyncThunk('user/remove-user-from-favourite', async (params) => {
+  try {
+    return await axiosInstance.post(`/api/user/remove-user-from-favourites/${params}`);
+  } catch (error) {
+    throw error;
+  }
+});
+
 const initialState = {
   loading: false,
   error: '',
@@ -106,6 +122,32 @@ const authSlice = createSlice({
       state.error = action.error;
     },
     [`${logout.fulfilled}`]: (state, action) => {
+      state.loading = false;
+      state.user = action.payload;
+    },
+
+    //add user to favourite
+    [`${addUserToFavourites.pending}`]: (state) => {
+      state.loading = true;
+    },
+    [`${addUserToFavourites.rejected}`]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [`${addUserToFavourites.fulfilled}`]: (state, action) => {
+      state.loading = false;
+      state.user = action.payload;
+    },
+
+    //remove user from favourite
+    [`${removeUserFromFavourites.pending}`]: (state) => {
+      state.loading = true;
+    },
+    [`${removeUserFromFavourites.rejected}`]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [`${removeUserFromFavourites.fulfilled}`]: (state, action) => {
       state.loading = false;
       state.user = action.payload;
     },
