@@ -44,6 +44,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const ProfileFriend = (props) => {
+ 
   const classes = useStyles();
   const dispatch = useDispatch();
   const [isShowFollowers, setIsShowFollowers] = useState(false);
@@ -56,10 +57,6 @@ const ProfileFriend = (props) => {
   const history = useHistory();
   const [showModal, setShowModal] = useState(0);
   const [isFollowed, setIsFollowed] = useState(false);
-
-  // useEffect(() => {
-
-  // }, [props.match.params.id]);
 
   const handleFollow = async () => {
     await dispatch(followApi(infoFriend._id));
@@ -88,7 +85,7 @@ const ProfileFriend = (props) => {
     if (infoUser?.role === 1 || infoFriend?.status === 1) return false;
     return listFollowing?.find((i) => i._id === infoFriend?._id) ? true : false;
   };
-  console.log('showPost: ', infoFriend?.status);
+
 
   const ShowPicture = (props) => {
     return (
@@ -160,19 +157,24 @@ const ProfileFriend = (props) => {
       socket?.emit('report_user', dataUser);
     }
   };
+  useEffect(() => {
+    console.log('alo alo')
+  }, [])
 
   useEffect(() => {
-    const fetchData = async () => {
+
+
+      console.log("inside")
       dispatch(getFollowers());
       dispatch(getFollowing());
-      const result = await dispatch(getProfileFriend(props.match.params.id));
-      console.log('resutl', result);
+      dispatch(getProfileFriend(props.match.params.id));
+
       dispatch(getPostFriend(props.match.params.id));
       listFollowing?.filter((i) => i._id === infoFriend?._id).length > 0 ? setIsFollowed(true) : setIsFollowed(false);
-    };
-    fetchData();
+  
+  
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listFollowing?.filter((i) => i._id === infoFriend?._id).length > 0, isFollowed, props.match.params.id]);
+  }, [isFollowed, props.match.params.id]);
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -218,9 +220,8 @@ const ProfileFriend = (props) => {
         {/* <button className="pop_btn">Xóa</button> */}
       </div>
     );
-  };
+};
 
-  console.log('infoFriend?.following?.userId: ', infoFriend);
 
   return (
     <>
@@ -274,7 +275,7 @@ const ProfileFriend = (props) => {
                             Hủy theo dõi
                           </button>
                         )
-                      ) : infoFriend.status === 1 &&
+                      ) : infoFriend?.status === 1 &&
                         infoFriend?.requests?.length &&
                         infoFriend?.requests?.includes(infoUser._id) ? (
                         <button

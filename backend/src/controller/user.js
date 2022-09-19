@@ -605,17 +605,12 @@ module.exports.sendMail = async (data) => {
   try {
     var transporter = nodemailer.createTransport({
       // config mail server
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
+      host: "smtp.mailtrap.io",
+      port: 2525,
       auth: {
-        user: 'hieu.phan@sotatek.com', //Tài khoản gmail vừa tạo
-        pass: 'hustphanhieu1432000', //Mật khẩu tài khoản gmail vừa tạo
-      },
-      tls: {
-        // do not fail on invalid certs
-        rejectUnauthorized: false,
-      },
+        user: "2408964e93047b",
+        pass: "5976e77d80cfcd"
+      }
     });
     var content = '';
     content += `
