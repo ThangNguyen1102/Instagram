@@ -608,8 +608,8 @@ module.exports.sendMail = async (data) => {
       host: 'smtp.mailtrap.io',
       port: 2525,
       auth: {
-        user: '21fae5b0d055ca',
-        pass: '5d070713f03117',
+        user: '2408964e93047b',
+        pass: '5976e77d80cfcd',
       },
     });
     var content = '';
