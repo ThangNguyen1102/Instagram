@@ -88,11 +88,12 @@ io.on('connection', (socket) => {
     io.emit('getNoti', data);
   });
   socket.on('inbox_user', async (data) => {
-    const user = await User.findOne({ _id: data.idMe });
-    const listFavourite = user.favourites;
+    const user1 = await User.findOne({ _id: data.idMe });
+    const user2 = await User.findOne({ _id: data.idFriend });
+    const listFavourite = user2.favourites;
     let check = false;
     for (let i = 0; i < listFavourite.length; i++) {
-      if (listFavourite[i].userId.toString() === data.idFriend) {
+      if (listFavourite[i].userId.toString() === data.idMe) {
         check = true;
         break;
       }
